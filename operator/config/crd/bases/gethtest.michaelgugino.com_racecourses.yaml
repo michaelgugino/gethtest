@@ -35,9 +35,12 @@ spec:
           spec:
             description: RacecourseSpec defines the desired state of Racecourse
             properties:
-              foo:
-                description: Foo is an example field of Racecourse. Edit racecourse_types.go
-                  to remove/update
+              deploymentName:
+                description: DeploymentName is what the controller will name child
+                  resources
+                type: string
+              image:
+                description: Override image string for deployment, not actually implemented
                 type: string
             type: object
           status:
