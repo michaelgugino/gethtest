@@ -30,6 +30,7 @@ import (
 	"k8s.io/apimachinery/pkg/fields" // Required for Watching
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types" // Required for Watching
+	"k8s.io/apimachinery/pkg/util/intstr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	// "sigs.k8s.io/controller-runtime/pkg/builder" // Required for Watching
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -159,7 +160,7 @@ func (r *RacecourseReconciler) createApp(rc *gethtestv1.Racecourse) error {
 							// Args:      args,
 							Ports: []corev1.ContainerPort{
 								{
-									Name:          "app",
+									Name:          "raceapp",
 									ContainerPort: 3000,
 								},
 							},
@@ -203,9 +204,39 @@ func (r *RacecourseReconciler) createApp(rc *gethtestv1.Racecourse) error {
 	if !dep.ObjectMeta.DeletionTimestamp.IsZero() {
 		return errors.New("Deployment marked as deleted, will create another.")
 	}
-	/*
-		svc := &kapps.Service{}
-	*/
+
+	svc := &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      rc.Spec.DeploymentName,
+			Namespace: rc.ObjectMeta.Namespace,
+		},
+		Spec: corev1.ServiceSpec{
+			Ports: []corev1.ServicePort{
+				corev1.ServicePort{
+					Name:       "http",
+					Port:       int32(3000),
+					TargetPort: intstr.FromString("raceapp"),
+				},
+			},
+			Selector: map[string]string{
+				"k8s-app": "racecourse-" + rc.Spec.DeploymentName,
+			},
+			Type: corev1.ServiceTypeClusterIP,
+		},
+	}
+
+	svcobjkey := client.ObjectKey{
+		Name:      rc.Spec.DeploymentName,
+		Namespace: rc.ObjectMeta.Namespace,
+	}
+	if err := createIfNotPresent(r.Client, svcobjkey, svc); err != nil {
+		return err
+	}
+
+	if !svc.ObjectMeta.DeletionTimestamp.IsZero() {
+		return errors.New("Service marked as deleted, will create another.")
+	}
+
 	return nil
 }
 
