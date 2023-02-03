@@ -18,7 +18,7 @@ podman run -d -p 30303:30303 -p 8545:8545 ethereum/client-go:v1.10.25 --http --h
 ```
 curl -X POST -H 'Content-Type: application/json' --data '{"jsonrpc":"2.0","method":"personal_newAccount","params":["password"],"id":1}' localhost:8545
 
-curl -X POST -H 'Content-Type: application/json' --data '{"jsonrpc":"2.0","method": "personal_unlockAccount", "params": ["0xd3c01b98bc7650a76354b14ad55ecc30df4b6bd1", "password", 0]}' localhost:8545
+curl -X POST -H 'Content-Type: application/json' --data '{"jsonrpc":"2.0","method": "personal_unlockAccount", "params": ["0xa1a58b295f10f4e52480a89340c0444a5e49cbca", "password", 0]}' localhost:8545
 ```
 
 ## build and install operator

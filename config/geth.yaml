@@ -18,20 +18,33 @@ spec:
         image: docker.io/ethereum/client-go:v1.10.25
         args:
         - "--http"
-        - "--http.addr \"0.0.0.0\""
-        - "--http.corsdomain=\"*\""
-        - "--http.port 8545"
-        - "--http.vhosts "*""
-        - "--http.api 'admin,personal,eth,net,web3,txpool,miner,clique,debug'"
-        - "--password /data/password"
+        - "--http.addr"
+        - "0.0.0.0"
+        - "--http.corsdomain"
+        - "'*'"
+        - "--http.port"
+        - "8545"
+        - "--http.vhosts"
+        - "'*'"
+        - "--http.api"
+        - "'admin,personal,eth,net,web3,txpool,miner,clique,debug'"
+        - "--password"
+        - "/data/password"
         - "--allow-insecure-unlock"
         - "--nodiscover"
-        - "--verbosity 4"
-        - "--miner.gastarget 804247552"
-        - "--miner.gasprice 0"
-        - "--mine --datadir /data"
-        - "--networkid 1999"
-        - "--miner.etherbase=0x00000000000000000000000000000000000000af"
+        - "--verbosity"
+        - "4"
+        - "--miner.gastarget"
+        - "804247552"
+        - "--miner.gasprice"
+        - "0"
+        - "--mine"
+        - "--datadir"
+        - "/data"
+        - "--networkid"
+        - "1999"
+        - "--miner.etherbase"
+        - "0x00000000000000000000000000000000000000af"
         imagePullPolicy: Always
         ports:
         - containerPort: 8545
@@ -59,3 +72,22 @@ spec:
     requests:
       # The amount of the volume's storage to request
       storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: geth
+spec:
+  ports:
+  - name: port-1
+    port: 8545
+    protocol: TCP
+    targetPort: 8545
+  - name: port-2
+    port: 30303
+    protocol: TCP
+    targetPort: 30303
+  selector:
+    app: geth
+  sessionAffinity: None
+  type: ClusterIP
