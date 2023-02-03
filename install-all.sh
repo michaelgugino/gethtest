@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# dependencies for kustomize
+apt-get install -y git make gcc
+
 ./install-go.sh
 export PATH=$PATH:/usr/local/go/bin
 

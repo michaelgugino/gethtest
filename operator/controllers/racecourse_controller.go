@@ -31,12 +31,12 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types" // Required for Watching
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/builder" // Required for Watching
+	// "sigs.k8s.io/controller-runtime/pkg/builder" // Required for Watching
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/handler"   // Required for Watching
-	"sigs.k8s.io/controller-runtime/pkg/predicate" // Required for Watching
+	// "sigs.k8s.io/controller-runtime/pkg/handler"   // Required for Watching
+	// "sigs.k8s.io/controller-runtime/pkg/predicate" // Required for Watching
 	"sigs.k8s.io/controller-runtime/pkg/reconcile" // Required for Watching
-	"sigs.k8s.io/controller-runtime/pkg/source"    // Required for Watching
+	// "sigs.k8s.io/controller-runtime/pkg/source"    // Required for Watching
 
 	gethtestv1 "github.com/michaelgugino/gethtest/operator/api/v1"
 )
@@ -188,6 +188,10 @@ func (r *RacecourseReconciler) createApp(rc *gethtestv1.Racecourse) error {
 		},
 	}
 
+	if err := controllerutil.SetControllerReference(rc, dep, r.Scheme); err != nil {
+		return err
+	}
+
 	depobjkey := client.ObjectKey{
 		Name:      rc.Spec.DeploymentName,
 		Namespace: rc.ObjectMeta.Namespace,
@@ -238,17 +242,18 @@ func (r *RacecourseReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&gethtestv1.Racecourse{}).
 		Owns(&kapps.Deployment{}).
-		Watches(
+		/* Watches(
 			&source.Kind{Type: &kapps.Deployment{}},
 			handler.EnqueueRequestsFromMapFunc(r.findObjectsForRacecourse),
 			builder.WithPredicates(predicate.ResourceVersionChangedPredicate{}),
-		).
+		). */
 		Owns(&corev1.Service{}).
-		Watches(
+		/* Watches(
 			&source.Kind{Type: &corev1.Service{}},
 			handler.EnqueueRequestsFromMapFunc(r.findObjectsForRacecourse),
 			builder.WithPredicates(predicate.ResourceVersionChangedPredicate{}),
-		).Complete(r)
+		). */
+		Complete(r)
 }
 
 func createIfNotPresent(kclient client.Client, objKey client.ObjectKey, obj client.Object) error {
