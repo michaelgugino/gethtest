@@ -67,7 +67,7 @@ const (
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.14.1/pkg/reconcile
 func (r *RacecourseReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx)
-
+	log.Error(errors.New("testing"), "reconciled")
 	// TODO(user): your logic here
 	rc := &gethtestv1.Racecourse{}
 	if err := r.Get(ctx, req.NamespacedName, rc); err != nil {
