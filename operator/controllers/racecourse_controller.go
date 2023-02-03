@@ -32,10 +32,10 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder" // Required for Watching
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/handler" // Required for Watching
+	"sigs.k8s.io/controller-runtime/pkg/handler"   // Required for Watching
 	"sigs.k8s.io/controller-runtime/pkg/predicate" // Required for Watching
 	"sigs.k8s.io/controller-runtime/pkg/reconcile" // Required for Watching
-	"sigs.k8s.io/controller-runtime/pkg/source" // Required for Watching
+	"sigs.k8s.io/controller-runtime/pkg/source"    // Required for Watching
 
 	gethtestv1 "github.com/michaelgugino/gethtest/operator/api/v1"
 )
@@ -54,7 +54,6 @@ const (
 	racecourseField = ".spec.deploymentName"
 )
 
-
 //+kubebuilder:rbac:groups=gethtest.michaelgugino.com,resources=racecourses,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=gethtest.michaelgugino.com,resources=racecourses/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=gethtest.michaelgugino.com,resources=racecourses/finalizers,verbs=update
@@ -71,11 +70,11 @@ func (r *RacecourseReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	// TODO(user): your logic here
 	rc := &gethtestv1.Racecourse{}
 	if err := r.Get(ctx, req.NamespacedName, rc); err != nil {
-			log.Error(err, "unable to fetch Racecourse")
-			// we'll ignore not-found errors, since they can't be fixed by an immediate
-			// requeue (we'll need to wait for a new notification), and we can get them
-			// on deleted requests.
-			return ctrl.Result{}, client.IgnoreNotFound(err)
+		log.Error(err, "unable to fetch Racecourse")
+		// we'll ignore not-found errors, since they can't be fixed by an immediate
+		// requeue (we'll need to wait for a new notification), and we can get them
+		// on deleted requests.
+		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
 	// name of our custom finalizer
@@ -132,7 +131,7 @@ func (r *RacecourseReconciler) createApp(rc *gethtestv1.Racecourse) error {
 	replicas := int32(1)
 	dep := &kapps.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: rc.Spec.DeploymentName,
+			Name:      rc.Spec.DeploymentName,
 			Namespace: rc.ObjectMeta.Namespace,
 		},
 		Spec: kapps.DeploymentSpec{
@@ -149,10 +148,10 @@ func (r *RacecourseReconciler) createApp(rc *gethtestv1.Racecourse) error {
 					},
 				},
 				Spec: corev1.PodSpec{
-					Containers:         []corev1.Container{
+					Containers: []corev1.Container{
 						{
-							Name:      "racecourse-app",
-							Image:     "quay.io/michaelgugino/gethtest:racecourse",
+							Name:  "racecourse-app",
+							Image: "quay.io/michaelgugino/gethtest:racecourse",
 							//' Command:   []string{"npm"},
 							// Args:      args,
 							Ports: []corev1.ContainerPort{
@@ -162,22 +161,22 @@ func (r *RacecourseReconciler) createApp(rc *gethtestv1.Racecourse) error {
 								},
 							},
 							/*
-							ReadinessProbe: &corev1.Probe{
-								ProbeHandler: corev1.ProbeHandler{
-									HTTPGet: &corev1.HTTPGetAction{
-										Path: "/healthz",
-										Port: intstr.Parse("app"),
+								ReadinessProbe: &corev1.Probe{
+									ProbeHandler: corev1.ProbeHandler{
+										HTTPGet: &corev1.HTTPGetAction{
+											Path: "/healthz",
+											Port: intstr.Parse("app"),
+										},
 									},
 								},
-							},
-							LivenessProbe: &corev1.Probe{
-								ProbeHandler: corev1.ProbeHandler{
-									HTTPGet: &corev1.HTTPGetAction{
-										Path: "/readyz",
-										Port: intstr.Parse("app"),
+								LivenessProbe: &corev1.Probe{
+									ProbeHandler: corev1.ProbeHandler{
+										HTTPGet: &corev1.HTTPGetAction{
+											Path: "/readyz",
+											Port: intstr.Parse("app"),
+										},
 									},
 								},
-							},
 							*/
 						},
 					},
@@ -187,14 +186,14 @@ func (r *RacecourseReconciler) createApp(rc *gethtestv1.Racecourse) error {
 	}
 
 	depobjkey := client.ObjectKey{
-		Name: rc.Spec.DeploymentName,
+		Name:      rc.Spec.DeploymentName,
 		Namespace: rc.ObjectMeta.Namespace,
 	}
 	if err := createIfNotPresent(r.Client, depobjkey, dep); err != nil {
 		return err
 	}
 	/*
-	svc := &kapps.Service{}
+		svc := &kapps.Service{}
 	*/
 	return nil
 }
@@ -233,15 +232,15 @@ func (r *RacecourseReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&gethtestv1.Racecourse{}).
 		Owns(&kapps.Deployment{}).
 		Watches(
-		&source.Kind{Type: &kapps.Deployment{}},
-		handler.EnqueueRequestsFromMapFunc(r.findObjectsForRacecourse),
-		builder.WithPredicates(predicate.ResourceVersionChangedPredicate{}),
+			&source.Kind{Type: &kapps.Deployment{}},
+			handler.EnqueueRequestsFromMapFunc(r.findObjectsForRacecourse),
+			builder.WithPredicates(predicate.ResourceVersionChangedPredicate{}),
 		).
 		Owns(&corev1.Service{}).
 		Watches(
-		&source.Kind{Type: &corev1.Service{}},
-		handler.EnqueueRequestsFromMapFunc(r.findObjectsForRacecourse),
-		builder.WithPredicates(predicate.ResourceVersionChangedPredicate{}),
+			&source.Kind{Type: &corev1.Service{}},
+			handler.EnqueueRequestsFromMapFunc(r.findObjectsForRacecourse),
+			builder.WithPredicates(predicate.ResourceVersionChangedPredicate{}),
 		).Complete(r)
 }
 
