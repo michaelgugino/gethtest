@@ -225,6 +225,10 @@ func (r *RacecourseReconciler) createApp(rc *gethtestv1.Racecourse) error {
 		},
 	}
 
+	if err := controllerutil.SetControllerReference(rc, svc, r.Scheme); err != nil {
+		return err
+	}
+
 	svcobjkey := client.ObjectKey{
 		Name:      rc.Spec.DeploymentName,
 		Namespace: rc.ObjectMeta.Namespace,
