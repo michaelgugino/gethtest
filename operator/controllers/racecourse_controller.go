@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"errors"
 
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -119,7 +120,9 @@ func (r *RacecourseReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		}
 	}
 
-	r.createApp(rc)
+	if err := r.createApp(rc); err != nil {
+		return ctrl.Result{}, err
+	}
 
 	// Add some status logic here
 	// Check deployment rollout status here
@@ -191,6 +194,10 @@ func (r *RacecourseReconciler) createApp(rc *gethtestv1.Racecourse) error {
 	}
 	if err := createIfNotPresent(r.Client, depobjkey, dep); err != nil {
 		return err
+	}
+
+	if !dep.ObjectMeta.DeletionTimestamp.IsZero() {
+		return errors.New("Deployment marked as deleted, will create another.")
 	}
 	/*
 		svc := &kapps.Service{}
