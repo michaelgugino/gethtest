@@ -1,0 +1,12 @@
+apiVersion: gethtest.michaelgugino.com/v1
+kind: Racecourse
+metadata:
+  labels:
+    app.kubernetes.io/name: racecourse
+    app.kubernetes.io/instance: racecourse-sample
+    app.kubernetes.io/part-of: operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: operator
+  name: racecourse-sample
+spec:
+  # TODO(user): Add fields here
